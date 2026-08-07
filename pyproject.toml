@@ -1,0 +1,7 @@
+[project]
+name = "memory-lm"
+version = "0.1.0"
+description = "Memory-augmented Qwen3: per-layer GDN2 RNN side branch with eviction-based long-range memory (training ≡ inference)"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = []

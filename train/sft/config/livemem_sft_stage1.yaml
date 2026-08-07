@@ -1,0 +1,45 @@
+# Train the full recurrent memory branch while freezing the attention and FFN main path.
+# Initialize on long-context data with 50 warmup steps followed by a constant schedule.
+# 2 nodes x 8 GPU, grad_accum=1 => 16 packs/step.
+model:
+  qwen3_path: Qwen/Qwen3-4B-Instruct-2507
+  memory_design: X
+  mem_layers: null
+  mem_o_proj_zero_init: true
+  attn_implementation: flex_attention
+  debug_small: false
+
+data:
+  kind: mixture
+  seed: 0
+  pack: true
+  max_len: 65536
+  inject_system: true
+  n_sink: 0
+  datasets:
+    - [longalign, single_sft, null]
+    - [longalpaca, single_sft, null]
+    - [ldc, single_sft, null]
+    - [longmit, single_sft, null]
+
+train:
+  trainable:
+    rnn: full
+    attn: frozen
+    ffn: frozen
+  batch_size: 1
+  loop:
+    lr: 5.0e-5
+    weight_decay: 0.01
+    scheduler: warmup_constant
+    warmup_steps: 50
+    max_steps: 100
+    grad_accum: 1
+    grad_clip: 1.0
+    log_every: 1
+    save_every: 100
+    output_dir: outputs/sft/LiveMem-SFT-stage1
+    grad_checkpointing: true
+    zero1: true
+    use_wandb: true
+    run_name: LiveMem-SFT-stage1

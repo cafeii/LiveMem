@@ -1,0 +1,8 @@
+# rollout.agent.agent_loop_config_path -> registers the per-request max_tokens +
+# group-affinity loop. The single_turn_agent alias shadows verl's builtin: the
+# fully_async path force-writes non_tensor agent_name="single_turn_agent"
+# (detach_utils.py:67), bypassing rollout.agent.default_agent_loop.
+- name: memory_single_turn
+  _target_: train.rl.memory_agent_loop.MemorySingleTurnAgentLoop
+- name: single_turn_agent
+  _target_: train.rl.memory_agent_loop.MemorySingleTurnAgentLoop

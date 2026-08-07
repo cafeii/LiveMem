@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "memory-qwen3-vllm"
+version = "0.0.1"
+description = "Non-invasive vLLM 0.19.1 integration for MemoryQwen3 (Qwen3 + per-layer GDN2 side branch)"
+requires-python = ">=3.10"
+dependencies = []
+
+# vLLM runs this in every process (engine core / workers) at startup, so the
+# model + config register without modifying vLLM source.
+[project.entry-points."vllm.general_plugins"]
+memory_qwen3 = "memory_qwen3.registry:register"
+
+[tool.setuptools]
+packages = ["memory_qwen3"]

@@ -1,0 +1,54 @@
+# Continue training the full recurrent memory branch while keeping the main path frozen.
+# Resume from a checkpoint with the same trainable form; use a constant schedule
+# through step 50 followed by cosine decay.
+# 2 nodes x 8 GPU, grad_accum=1 => 16 packs/step.
+model:
+  qwen3_path: Qwen/Qwen3-4B-Instruct-2507
+  memory_design: X
+  mem_layers: null
+  mem_o_proj_zero_init: true
+  attn_implementation: flex_attention
+  debug_small: false
+
+data:
+  kind: mixture
+  seed: 0
+  pack: true
+  max_len: 65536
+  inject_system: true
+  n_sink: 0
+  datasets:
+    - [musique, single_sft, null]
+    - [2wikimultihopqa, single_sft, null]
+    - [narrativeqa, single_sft, null]
+    - [qasper, single_sft, null]
+    - [longalign, single_sft, 1000]
+    - [longalpaca, single_sft, 1000]
+    - [ldc, single_sft, 1000]
+    - [longmit, single_sft, 1000]
+    - [agnews, single_sft, null]
+    - [dbpedia, single_sft, null]
+
+train:
+  resume_trainable_from: outputs/sft/LiveMem-SFT-stage1/step_100/trainable.pt
+  trainable:
+    rnn: full
+    attn: frozen
+    ffn: frozen
+  batch_size: 1
+  loop:
+    lr: 5.0e-5
+    weight_decay: 0.01
+    scheduler: constant_cosine
+    constant_steps: 50
+    warmup_steps: 0
+    max_steps: 500
+    grad_accum: 1
+    grad_clip: 1.0
+    log_every: 1
+    save_every: 100
+    output_dir: outputs/sft/LiveMem-SFT-stage2
+    grad_checkpointing: true
+    zero1: true
+    use_wandb: true
+    run_name: LiveMem-SFT-stage2

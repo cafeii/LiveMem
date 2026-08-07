@@ -1,0 +1,28 @@
+dataset/
+/dataset
+outputs/
+results/
+logs/
+wandb/
+
+# Secrets
+.env
+
+# Notebook checkpoints
+.ipynb_checkpoints/
+
+# Python-generated files
+__pycache__/
+*.py[oc]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv*

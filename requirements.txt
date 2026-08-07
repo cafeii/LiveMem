@@ -1,0 +1,10 @@
+torch
+transformers
+peft
+accelerate
+einops
+PyYAML
+pyarrow
+pandas
+datasets
+huggingface_hub

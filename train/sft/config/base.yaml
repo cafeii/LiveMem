@@ -1,0 +1,40 @@
+# Default SFT configuration.
+# Override from CLI: --set train.loop.max_steps=500 model.memory_design=X
+
+model:
+  qwen3_path: Qwen/Qwen3-4B-Instruct-2507
+  memory_design: X            # X = continuous scan + dynamic eviction
+  mem_layers: null            # null = all 36 layers
+  mem_o_proj_zero_init: true  # start near the original Qwen3
+  attn_implementation: flex_attention   # dynamic eviction mask
+  debug_small: false          # true = minimal two-layer model
+
+data:
+  kind: mixture               # mixture (real arrow + per-dataset counts) | synthetic | jsonl
+  seed: 0
+  pack: false
+  max_len: 65536              # training length filter
+  n_sink: 0                   # leading chunks kept as attention sink; 0 disables it
+  datasets:                   # [dataset, split_file, count]  (count null = all)
+    - [musique, single_sft, 1000]
+    - [qasper, single_sft, null]
+
+train:
+  tier: L1                    # L1 side path | L2 + main-path attention | L3 + FFN
+  train_norms: false
+  train_embed: false
+  batch_size: 1               # per-device, without padding
+  loop:
+    lr: 2.0e-4
+    weight_decay: 0.01
+    warmup_steps: 20
+    max_steps: 1000
+    grad_accum: 8
+    grad_clip: 1.0
+    log_every: 10
+    eval_every: 0
+    save_every: 500
+    output_dir: outputs/sft/dev
+    grad_checkpointing: true
+    use_wandb: false
+    run_name: sft-dev
